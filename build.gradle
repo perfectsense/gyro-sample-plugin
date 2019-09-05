@@ -1,0 +1,73 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+}
+
+if (System.getenv('TRAVIS_BRANCH') && System.getenv('TRAVIS_PULL_REQUEST') == 'false') {
+    defaultTasks 'build', 'publish'
+
+} else {
+    defaultTasks 'build', 'publishToMavenLocal'
+}
+
+group = 'gyro'
+version = '0.15-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven {
+        url 'https://artifactory.psdops.com/public'
+    }
+
+    maven {
+        url 'https://artifactory.psdops.com/gyro-snapshots'
+    }
+}
+
+dependencies {
+    api 'gyro:gyro-core:0.15-SNAPSHOT'
+
+    implementation 'com.psddev:dari-util:3.3.607-xe0f27a'
+    implementation 'org.yaml:snakeyaml:1.24'
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:5.4.0.201906121030-r'
+    implementation 'us.monoid.web:resty:0.3.2'
+    implementation 'gyro:gyro-aws-provider:0.15-SNAPSHOT'
+    implementation enforcedPlatform('software.amazon.awssdk:bom:2.5.70')
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:apache-client'
+    implementation 'com.spotify:docker-client:8.6.2:shaded'
+    implementation 'org.apache.httpcomponents:httpclient:4.5'
+    implementation 'org.apache.httpcomponents:httpcore:4.4'
+    implementation 'javax.activation:activation:1.1.1'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            credentials {
+                username System.getenv('GRADLE_DEPLOY_USER')
+                password System.getenv('GRADLE_DEPLOY_PASSWORD')
+            }
+
+            if (project.version.endsWith('-SNAPSHOT')) {
+                url 'https://artifactory.psdops.com/gyro-snapshots'
+
+            } else {
+                url 'https://artifactory.psdops.com/gyro-releases'
+            }
+        }
+    }
+}
