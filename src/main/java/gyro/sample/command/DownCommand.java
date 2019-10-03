@@ -33,6 +33,7 @@ public class DownCommand extends AbstractConfigCommand {
             .stream()
             .filter(AutoScalingGroupResource.class::isInstance)
             .map(AutoScalingGroupResource.class::cast)
+            .filter(this::isAutoScalingGroupActive)
             .collect(Collectors.toList());
 
         if (instances.isEmpty() && autoscalingGroups.isEmpty()) {
@@ -43,7 +44,6 @@ public class DownCommand extends AbstractConfigCommand {
         if (!instances.isEmpty()) {
             GyroCore.ui().write("\nInstances:\n");
             instances.forEach(this::displayInstance);
-
         }
 
         if (!autoscalingGroups.isEmpty()) {
@@ -69,6 +69,10 @@ public class DownCommand extends AbstractConfigCommand {
         try (Ec2Client client = InstanceResource.createClient(Ec2Client.class, instance.credentials(AwsCredentials.class))) {
             client.stopInstances(r -> r.instanceIds(instance.getInstanceId()));
         }
+    }
+
+    private boolean isAutoScalingGroupActive(AutoScalingGroupResource group) {
+        return group.getMinSize() > 0 || group.getMaxSize() > 0;
     }
 
     private void displayAutoScalingGroup(AutoScalingGroupResource group) {
