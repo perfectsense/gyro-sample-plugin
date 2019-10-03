@@ -55,7 +55,7 @@ dependencies {
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.4.0.201906121030-r'
     implementation 'org.fusesource.jansi:jansi:1.16'
     implementation 'us.monoid.web:resty:0.3.2'
-    implementation 'gyro:gyro-aws-provider:0.15-SNAPSHOT'
+    implementation 'gyro:gyro-aws-provider:0.99.0-SNAPSHOT'
     implementation enforcedPlatform('software.amazon.awssdk:bom:2.5.70')
     implementation 'software.amazon.awssdk:s3'
     implementation 'software.amazon.awssdk:apache-client'
