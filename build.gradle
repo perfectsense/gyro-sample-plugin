@@ -53,6 +53,7 @@ dependencies {
     implementation 'com.psddev:dari-util:3.3.607-xe0f27a'
     implementation 'org.yaml:snakeyaml:1.24'
     implementation 'org.eclipse.jgit:org.eclipse.jgit:5.4.0.201906121030-r'
+    implementation 'org.fusesource.jansi:jansi:1.16'
     implementation 'us.monoid.web:resty:0.3.2'
     implementation 'gyro:gyro-aws-provider:0.15-SNAPSHOT'
     implementation enforcedPlatform('software.amazon.awssdk:bom:2.5.70')
