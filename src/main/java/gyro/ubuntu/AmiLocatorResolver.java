@@ -24,10 +24,10 @@ public class AmiLocatorResolver extends ReferenceResolver {
             throw new GyroException("ubuntu-ami-locator needs 4 arguments - 'name', 'architecture', 'instance-type' and 'region'");
         }
 
-        String zone = (String) arguments.get(0);
-        String name = (String) arguments.get(1);
-        String arch = (String) arguments.get(2);
-        String type = (String) arguments.get(3);
+        String name = (String) arguments.get(0);
+        String arch = (String) arguments.get(1);
+        String type = (String) arguments.get(2);
+        String zone = (String) arguments.get(3);
 
         JSONObject json = new JSONObject(IOUtils.toString(new URL("https://cloud-images.ubuntu.com/locator/ec2/releasesTable"), StandardCharsets.UTF_8));
         JSONArray array = json.getJSONArray("aaData");
