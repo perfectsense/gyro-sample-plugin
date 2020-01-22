@@ -1,5 +1,8 @@
 package gyro.sample.command;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import gyro.aws.AwsCredentials;
 import gyro.aws.autoscaling.AutoScalingGroupResource;
 import gyro.aws.ec2.InstanceResource;
@@ -12,9 +15,6 @@ import io.airlift.airline.Command;
 import software.amazon.awssdk.services.autoscaling.AutoScalingClient;
 import software.amazon.awssdk.services.ec2.Ec2Client;
 import software.amazon.awssdk.services.ec2.model.InstanceStateName;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Command(name = "down", description = "Stop AWS instances and clear instances in autoscaling groups.")
 public class DownCommand extends AbstractConfigCommand {
@@ -51,23 +51,28 @@ public class DownCommand extends AbstractConfigCommand {
             autoscalingGroups.forEach(this::displayAutoScalingGroup);
         }
 
-        if (GyroCore.ui().readBoolean(Boolean.FALSE, "\nAre you sure you want to stop instances and clear the auto scaling groups listed above?")) {
+        if (GyroCore.ui()
+            .readBoolean(
+                Boolean.FALSE,
+                "\nAre you sure you want to stop instances and clear the auto scaling groups listed above?")) {
             instances.forEach(this::stopInstance);
             autoscalingGroups.forEach(this::clearAutoscalingGroup);
         }
     }
 
     private boolean isInstanceRunning(InstanceResource instance) {
-        return InstanceStateName.RUNNING.toString().equals(instance.getState());
+        return InstanceStateName.RUNNING.toString().equals(instance.getGyroInstanceState());
     }
 
     private void displayInstance(InstanceResource instance) {
-        GyroCore.ui().write("- [%s] %s\n", instance.getLocation(), instance.getInstanceId());
+        GyroCore.ui().write("- [%s] %s\n", instance.getGyroInstanceLocation(), instance.getGyroInstanceId());
     }
 
     private void stopInstance(InstanceResource instance) {
-        try (Ec2Client client = InstanceResource.createClient(Ec2Client.class, instance.credentials(AwsCredentials.class))) {
-            client.stopInstances(r -> r.instanceIds(instance.getInstanceId()));
+        try (Ec2Client client = InstanceResource.createClient(
+            Ec2Client.class,
+            instance.credentials(AwsCredentials.class))) {
+            client.stopInstances(r -> r.instanceIds(instance.getGyroInstanceId()));
         }
     }
 
@@ -80,7 +85,9 @@ public class DownCommand extends AbstractConfigCommand {
     }
 
     private void clearAutoscalingGroup(AutoScalingGroupResource group) {
-        try (AutoScalingClient client = AutoScalingGroupResource.createClient(AutoScalingClient.class, group.credentials(AwsCredentials.class))) {
+        try (AutoScalingClient client = AutoScalingGroupResource.createClient(
+            AutoScalingClient.class,
+            group.credentials(AwsCredentials.class))) {
             client.updateAutoScalingGroup(r -> r
                 .autoScalingGroupName(group.getName())
                 .maxSize(0)
